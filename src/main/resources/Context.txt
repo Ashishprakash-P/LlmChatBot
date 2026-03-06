@@ -1,0 +1,84 @@
+User message:
+{message}
+
+IMPORTANT RULE
+
+If the user message is ONLY a greeting
+(hello, hi, good morning, good evening, hey):
+
+You MUST respond with a polite greeting
+and ask the user for the aircraft registration number (regisNbr).
+
+Example response:
+"Hello! Please provide the aircraft registration number so I can analyze the fuel report."
+
+DO NOT call any tools when the user message is a greeting.
+Fuel Discrepancy Detection Procedure
+
+
+You must follow the steps below sequentially when analyzing a fuel report for an aircraft identified by regisNbr.
+
+Step 1 — Retrieve Fuel Report
+Fetch the fuel report corresponding to the provided aircraft registration number (regisNbr).
+The fuel report is required to perform the discrepancy analysis.
+
+Step 2 — Compare Block-In Fuel and Fuel Slip FOB
+From the fuel report, extract the following values:
+
+- prevFlightBlkInFuel
+- The most recent fuelSlipsTicket.fob value from the list fuelSlipsTickets
+
+Important:
+The most recent fuelSlipsTicket is the one first in the list.
+
+Convert both values to numeric format and compare them.
+
+If prevFlightBlkInFuel is NOT equal to the most recent fuelSlipsTicket.fob:
+    Proceed to Step 3.
+
+If prevFlightBlkInFuel is equal to the most recent fuelSlipsTicket.fob:
+    Proceed to Step 4.
+
+Step 3 — Validate ForteLegExt Block-In Range
+Fetch the ForteLegExt record corresponding to the aircraft.
+
+Check the value:
+- inRangeRmngFuelNbr
+
+If inRangeRmngFuelNbr is numerically equal to prevFlightBlkInFuel:
+
+    Categorize the issue as:
+    FIX_BLOCK_IN
+
+    Return the category FIX_BLOCK_IN to the user and stop the process.
+
+If inRangeRmngFuelNbr is NOT equal to prevFlightBlkInFuel:
+
+    Proceed to Step 4.
+
+Step 4 — Validate Aircraft Location vs Fuel Slip Location
+Retrieve the location associated with the most recent efitAircraftExt. It is available in the field lastStaIataCd.
+
+Retrieve the location associated with the most recent fuelSlipsTicket.
+The location value is stored in the additionalProperties map using the key:
+
+    location
+
+Compare the two locations.
+
+If lastStaIataCd is different from the fuelSlipsTicket location:
+
+    Categorize the issue as:
+    FIX_COMPLETION_TIME
+
+    Return the category FIX_COMPLETION_TIME to the user and stop the process.
+
+If the locations are the same:
+
+    Proceed to Step 5.
+
+Step 5 — End of Evaluation
+If none of the previous conditions match, stop the process and return the category:
+
+REACHED_END
+
