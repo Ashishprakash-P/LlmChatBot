@@ -28,7 +28,9 @@ public class AppConfig {
         String systemDefaultTxt = classPathResource.getContentAsString(StandardCharsets.UTF_8);
         return builder
                 .defaultAdvisors(
-                        MessageChatMemoryAdvisor.builder(chatMemory).build()
+                        MessageChatMemoryAdvisor.builder(chatMemory)
+                                .conversationId(ChatMemory.CONVERSATION_ID)
+                                .build()
                 )
                 .defaultSystem(systemDefaultTxt)
                 .defaultTools(fuelService)
