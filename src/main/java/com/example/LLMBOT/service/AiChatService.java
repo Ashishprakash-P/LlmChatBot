@@ -22,12 +22,16 @@ public class AiChatService {
     }
 
     public String askQuestion(String message) throws IOException {
+        if(isGreeting(message)){
+            return "Hello! Please provide the aircraft registration number so I can analyze the fuel report.";
+        }
         log.info("User sent message: {} ", message);
-        ClassPathResource classPathResource = new ClassPathResource("/Context.txt");
+        ClassPathResource classPathResource = new ClassPathResource("/ContextQwen2.5-3b.txt");
         String contextTxt = classPathResource.getContentAsString(StandardCharsets.UTF_8);
         PromptTemplate promptTemplate = new PromptTemplate(contextTxt);
         Prompt prompt = promptTemplate.create(Map.of("message", message));
         System.out.println(prompt.toString());
+
         String outputText = chatClient
                 .prompt(prompt)
                 .call()
@@ -35,6 +39,11 @@ public class AiChatService {
 
         log.info("Model responed with: {}", outputText.toString());
         return outputText;
+    }
+
+    private boolean isGreeting(String msg) {
+        String lower = msg.toLowerCase().trim();
+        return lower.matches("^(hi|hello|hey|good morning|good afternoon|good evening)\\b.*");
     }
 }
 

@@ -16,5 +16,6 @@ public class FuelSlipsTicket {
     private String lbs;
     private String fob;
     private Integer rowNum;
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private String location;
+//    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 }
